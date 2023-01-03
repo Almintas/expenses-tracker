@@ -16,4 +16,10 @@ const mysqlConfig = {
 
 const connection = mysql.createConnection(mysqlConfig);
 
+app.get('/expenses', (req, res) => {
+    connection.execute('SELECT * FROM expenses', (err, result) => {
+        res.send(result);
+    });
+});
+
 app.listen(3000, () => console.log('Server is ONLINE'));
