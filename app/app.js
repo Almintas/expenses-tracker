@@ -16,10 +16,19 @@ const mysqlConfig = {
 
 const connection = mysql.createConnection(mysqlConfig);
 
+// app.get('/expenses/:id', (req, res) => {
+//     connection.execute('SELECT * FROM expenses WHERE userId=?', [req.params.id], (err, result) => {
+//         res.send(result);
+//     });
+// });
+
 app.get('/expenses', (req, res) => {
-    connection.execute('SELECT * FROM expenses', (err, result) => {
+    const { userId } = req.query;
+    connection.execute('SELECT * FROM expenses WHERE userId=?', [userId], (err, result) => {
         res.send(result);
     });
 });
 
-app.listen(3000, () => console.log('Server is ONLINE'));
+
+
+app.listen(8080, () => console.log('Server is ONLINE'));
