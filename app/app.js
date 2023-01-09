@@ -3,6 +3,8 @@ const app = express();
 const cors = require('cors');
 const mysql = require('mysql2');
 const { config } = require('dotenv');
+const bcrypt = require('bcrypt');
+const e = require('express');
 
 require('dotenv').config();
 
@@ -42,6 +44,32 @@ app.post('/expenses', (req, res) => {
     });
 });
 
+app.post('/register', (req, res) => {
+    const { name, password } = req.body;
+    const hashedPassword = bcrypt.hashSync(password, 12);
+
+    connection.execute('INSERT INTO users (name, password) VALUES(?, ?)', [name, hashedPassword], (err, result) => {
+        res.sendStatus(200);
+    });
+});
+
+app.post('/login', (req, res) => {
+    const { name, password } = req.body;
+
+    connection.execute('SELECT * FROM users WHERE name=?', [name], (err, result) => {
+        if (result.length == 0) {
+            res.send('Incorrect username or password');
+        } else {
+            const passwordHash = result[0].password
+            const isPasswordCorrect = bcrypt.compareSync(password, passwordHash);
+            if (isPasswordCorrect) {
+                res.send('Successul Log In');
+            } else {
+                res.send('Incorrect username or password');
+            }
+        };
+    });
+});
 
 
 app.listen(8080, () => console.log('Server is ONLINE'));
