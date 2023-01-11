@@ -49,7 +49,7 @@ app.post('/register', (req, res) => {
     const hashedPassword = bcrypt.hashSync(password, 12);
 
     connection.execute('INSERT INTO users (name, password) VALUES(?, ?)', [name, hashedPassword], (err, result) => {
-        res.sendStatus(200);
+        res.send(result);
     });
 });
 
@@ -58,14 +58,16 @@ app.post('/login', (req, res) => {
 
     connection.execute('SELECT * FROM users WHERE name=?', [name], (err, result) => {
         if (result.length == 0) {
-            res.send('Incorrect username or password');
+            res.status(401);
+            res.send('Incorect username or password');
         } else {
             const passwordHash = result[0].password
             const isPasswordCorrect = bcrypt.compareSync(password, passwordHash);
             if (isPasswordCorrect) {
                 res.send(result[0]);
             } else {
-                res.send('Incorrect username or password');
+                res.status(401);
+                res.send({ msg: 'Incorect username or password' });
             }
         };
     });
